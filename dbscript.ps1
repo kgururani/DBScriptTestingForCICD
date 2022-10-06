@@ -1,6 +1,4 @@
-#Author      	Gautham Sreenivasan	
-#Version 	2.0
-#################
+
 #read the arguments from the CLI
 param (
 	$d,
@@ -94,7 +92,7 @@ function script-execute {
 		        Write-Warning " Table does not exist in DB. Executing first script"
 		        $first_script= ($sql_files | Measure -Min).Minimum
 		        $first_script
-		        $first_script_target= Get-ChildItem "$repo_dir\*.x\$first_script"
+		        $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$first_script"
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
@@ -104,12 +102,12 @@ function script-execute {
 	write-host "INFO: Version on Db: "$db_version
 	for($i=0; $i -le ($sql_files.length -1); $i +=1){
 		        $version_num= $sql_files[$i].split('-')[0]
-		        $version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
+		        $version_num_check= $version_num -match '\d{1,3}'
 			        if($version_num_check -eq 'True'){
 			                if($version_num -gt $db_version){
 		                        Write-Host "EXEC: executing script: "$sql_files[$i]
 		                        $exec_file=$sql_files[$i]
-		                        $target=Get-ChildItem "$repo_dir\*.x\$exec_file"
+		                        $target=Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$exec_file"
 		                        sqlcmd -S $h -U $uname -P $password -i $target
 		                        #write-host $repo_dir\1.0.0.x\$sql_files[$i]
 			                }
