@@ -4,12 +4,12 @@
 #read the arguments from the CLI
 param (
 	$d,
-	$h=,
-	$uname=,
+	$h,
+	$uname,
 	$branch, 
 	$password, 
-	$repo_dir=,
-	$table_name=
+	$repo_dir,
+	$table_name
 	)
 
 if(!$d){
