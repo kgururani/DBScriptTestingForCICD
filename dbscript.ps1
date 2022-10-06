@@ -1,4 +1,3 @@
-
 #read the arguments from the CLI
 param (
 	$d,
