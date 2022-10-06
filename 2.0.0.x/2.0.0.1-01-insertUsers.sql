@@ -26,10 +26,10 @@ INSERT INTO [dbo].[PIPELINE_CICD_TESTING]
 		   ,[CURRENT_VERSION])
 		   
      VALUES
-           ('Azure4'
-           ,'Testing4'
+           ('Azure3'
+           ,'Testing3'
            ,'kgururani@deloitte.com'
-           ,'tester4'
+           ,'tester3'
            ,'U'
            ,NULL
            ,NULL
