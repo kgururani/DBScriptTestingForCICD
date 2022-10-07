@@ -121,6 +121,10 @@ function script-execute {
 	        write-host "Files with issue in name convention"
 	        $sql_file_issue
 	}
+	##Update current version from database table
+	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = " $version_num | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	write-host "INFO: Updated Version on Db: "$db_version
+	
 }
 
 
