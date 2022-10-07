@@ -1,7 +1,7 @@
 USE [BACMRMQA]
 GO
 
-/****** Object:  Table [dbo].[USERS]    Script Date: 7/28/2022 3:17:43 PM *******/
+/****** Object:  Table [dbo].[USERS]    Script Date: 7/28/2022 3:17:43 PM ******/
 SET ANSI_NULLS ON
 GO
 
