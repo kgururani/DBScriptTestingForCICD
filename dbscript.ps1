@@ -111,6 +111,8 @@ function script-execute {
 		                        $target=Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$exec_file"
 		                        sqlcmd -S $h -U $uname -P $password -i $target
 		                        #write-host $repo_dir\1.0.0.x\$sql_files[$i]
+					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+
 			                }
 			        }
 			        else {
@@ -124,7 +126,6 @@ function script-execute {
 	}
 	##Update current version from database table
 	write-host "INFO: version_num: " $version_num
-	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		
 }
 
