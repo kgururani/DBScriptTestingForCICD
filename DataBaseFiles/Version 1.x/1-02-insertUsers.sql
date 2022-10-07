@@ -12,8 +12,3 @@ INSERT INTO [dbo].[PIPELINE_CICD_TESTING]
            ,'Testing1'
            ,'kgururani@deloitte.com'
            ,'1')
-		   
-GO
-
-UPDATE [dbo].[PIPELINE_CICD_TESTING]
-SET CURRENT_VERSION = '1'
