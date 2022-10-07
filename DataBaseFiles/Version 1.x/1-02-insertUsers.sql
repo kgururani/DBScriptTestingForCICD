@@ -4,11 +4,10 @@ GO
 INSERT INTO [dbo].[PIPELINE_CICD_TESTING]
            ([FIRST_NAME]
            ,[LAST_NAME]
-           ,[EMAIL_ID]
-           ,[CURRENT_VERSION])
+           ,[EMAIL_ID])
 		   
      VALUES
            ('Azure1'
            ,'Testing1'
-           ,'kgururani@deloitte.com'
-           ,'1')
+           ,'kgururani@deloitte.com')
+GO
