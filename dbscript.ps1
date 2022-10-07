@@ -85,7 +85,7 @@ function script-execute {
 	$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\*\*.sql" -Leaf -Resolve
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$table_name" -Q $query
-	if($table_val){
+	if($d$table_val){
 		        write-host "PASS: Table exists"
 	}
 	else{
@@ -123,7 +123,7 @@ function script-execute {
 	}
 	##Update current version from database table
 	write-host "INFO: version_num: "$version_num
-	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION =  $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	write-host "INFO: Updated Version on Db: "$db_version
 	
 }
