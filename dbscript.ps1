@@ -77,7 +77,7 @@ function script-execute {
 	$sql_file_issue= @()
 
 
-	$query= $("IF OBJECT_ID(N'$table_name', N'U') IS NOT NULL
+	$query= $("IF OBJECT_ID(N'$d.$table_name', N'U') IS NOT NULL
 	        BEGIN
 	            PRINT 'True'
                 END")
