@@ -1,5 +1,5 @@
 
-#read the arguments from the Command Line Interface
+#read the arguments from the Command Line Interfaces
 param (
 	$d,
 	$h,
