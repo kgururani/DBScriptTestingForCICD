@@ -101,6 +101,7 @@ function script-execute {
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	write-host "INFO: Version on Db: "$db_version
 	for($i=0; $i -le ($sql_files.length -1); $i +=1){
+				Write-Host "EXEC testt"
 		        $version_num= $sql_files[$i].split('-')[0]
 		        $version_num_check= $version_num -match '\d{1,3}'
 			        if($version_num_check -eq 'True'){
@@ -123,7 +124,8 @@ function script-execute {
 	}
 	##Update current version from database table
 	write-host "INFO: version_num: " $version_num
-	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }		
+	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		
 }
 
 
