@@ -85,7 +85,7 @@ function script-execute {
 	$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\*\*.sql" -Leaf -Resolve
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$table_name" -Q $query
-	if($d$table_val){
+	if($d.$table_val){
 		        write-host "PASS: Table exists"
 	}
 	else{
