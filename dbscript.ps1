@@ -123,8 +123,7 @@ function script-execute {
 	}
 	##Update current version from database table
 	write-host "INFO: version_num: " $version_num
-	$db_version = sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-	write-host "INFO: Updated Version on Db: " $db_version	
+	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }		
 }
 
 
