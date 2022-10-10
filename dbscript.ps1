@@ -83,6 +83,7 @@ function script-execute {
             END")
 	##Adding sql scripts in repo to array
 	$sql_folders = Split-Path -Path "$repo_dir\DataBaseFiles\*" -Leaf -Resolve
+	$sql_file= Split-Path -Path "$repo_dir\DataBaseFiles\Version-0\*.sql" -Leaf -Resolve
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$d.$table_name" -Q $query
 	if($table_val){
@@ -90,7 +91,7 @@ function script-execute {
 	}
 	else{
 		    Write-Warning " Table does not exist in DB. Executing first script"
-		    $first_script= ($sql_files | Measure -Min).Minimum
+		    $first_script= ($sql_file | Measure -Min).Minimum
 		    $first_script
 		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
