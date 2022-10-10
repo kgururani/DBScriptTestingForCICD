@@ -104,9 +104,9 @@ function script-execute {
 	write-host "INFO: Version on Db: "$db_version
 	write-host "INFO: SUB Version on Db: "$db_sub_version
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
-		$version_num= $sql_folders[$i].split('-')[1]
-		write-host "FOLDER VERSION: " $version_num
-		if($version_num -ne "version-0"){
+		if($sql_folders[$i] -ne "version-0"){
+			$version_num= $sql_folders[$i].split('-')[1]
+			write-host "FOLDER VERSION: " $version_num
 			write-host "FIRST TIME"
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check -eq 'True'){
@@ -153,3 +153,4 @@ function script-execute {
 }
 
 script-execute
+
