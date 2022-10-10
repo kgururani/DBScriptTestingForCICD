@@ -99,11 +99,15 @@ function script-execute {
 
 	##fetch current version from database table
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	$db_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	
 	write-host "INFO: Version on Db: "$db_version
+	write-host "INFO: SUB Version on Db: "$db_sub_version
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
 		$version_num= $sql_folders[$i].split('-')[1]
-		write-host "TEST: " $version_num
-		if($version_num -ne "version-0.x"){
+		write-host "FOLDER VERSION: " $version_num
+		if($version_num -ne "version-0"){
+			write-host "FIRST TIME"
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check -eq 'True'){
 				if($version_num -gt $db_version){
