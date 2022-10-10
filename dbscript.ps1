@@ -80,19 +80,19 @@ function script-execute {
 	$query= $("IF OBJECT_ID(N'$d.$table_name', N'U') IS NOT NULL
 	        BEGIN
 	            PRINT 'True'
-                END")
+            END")
 	##Adding sql scripts in repo to array
-	$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\*\*.sql" -Leaf -Resolve
+	$sql_folders = Split-Path -Path "$repo_dir\DataBaseFiles\*" -Leaf -Resolve
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$d.$table_name" -Q $query
 	if($table_val){
 		        write-host "PASS: Table exists"
 	}
 	else{
-		        Write-Warning " Table does not exist in DB. Executing first script"
-		        $first_script= ($sql_files | Measure -Min).Minimum
-		        $first_script
-		        $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$first_script"
+		    Write-Warning " Table does not exist in DB. Executing first script"
+		    $first_script= ($sql_files | Measure -Min).Minimum
+		    $first_script
+		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$first_script"
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
@@ -100,31 +100,46 @@ function script-execute {
 	##fetch current version from database table
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	write-host "INFO: Version on Db: "$db_version
-	for($i=0; $i -le ($sql_files.length -1); $i +=1){
-		        $version_num= $sql_files[$i].split('-')[0]
-		        $version_num_check= $version_num -match '\d{1,3}'
-			        if($version_num_check -eq 'True'){
-			                if($version_num -gt $db_version){
-		                        Write-Host "EXEC: executing script: "$sql_files[$i]
-		                        $exec_file=$sql_files[$i]
-		                        $target=Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$exec_file"
-		                        sqlcmd -S $h -U $uname -P $password -i $target
-		                        #write-host $repo_dir\1.0.0.x\$sql_files[$i]
-					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-
-			                }
-			        }
-			        else {
-			                Write-Error "ERROR: Filename does not match the format: " $sql_files[$i]
-			                $sql_file_issue += $sql_files[$i]
-			        }
+	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
+		$version_num= $sql_folders[$i].split('-')[1]
+		write-host "TEST: " $version_num
+		$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
+		if($version_num_check -eq 'True'){
+		    if($version_num -gt $db_version){
+				$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
+				for($i=0; $i -le ($sql_files.length -1); $i +=1){
+					Write-Host "EXEC: executing script: "$sql_files[$i]
+					$sub_version_num= $sql_files[$i].split('-')[0]
+					write-host "TEST AGAIN: " $sub_version_num
+					$sub_version_num_check= $sub_version_num -match '\d{1,3}'
+					if($sub_version_num_check -eq 'True'){
+						if($sub_version_num -gt $db_version){
+							$exec_file=$sql_files[$i]
+							$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
+							sqlcmd -S $h -U $uname -P $password -i $target
+							##Update current sub version from database table
+							sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+							$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+							write-host "INFO: updated version_num: " $db_updated_version
+						}
+					}
+				}
+				##Update current sub version from database table
+				sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+				$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }\
+				write-host "INFO: updated version_num: " $db_updated_version
+			}
+		}						
 	}
+	else {
+		Write-Error "ERROR: Filename does not match the format: " $sql_files[$i]
+		$sql_file_issue += $sql_files[$i]
+	}
+}
 	if($sql_file_issue -ne ""){
 	        write-host "Files with issue in name convention"
 	        $sql_file_issue
 	}
-	##Update current version from database table
-	write-host "INFO: version_num: " $version_num
 		
 }
 
