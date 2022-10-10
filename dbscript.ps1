@@ -104,12 +104,9 @@ function script-execute {
 	
 	write-host "INFO: Version on Db: "$db_version
 	write-host "INFO: SUB Version on Db: "$db_sub_version
-	write-host "INFO: $sql_folders.length: "$sql_folders.length
-write-host "INFO: $sql_folders.length1: "$sql_folders[0]
-
-write-host "INFO: $sql_folders.length2: "$sql_folders[1]
+	
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
-		if($sql_folders[$i] -ne "version-0"){
+		if($sql_folders[$i] -ne "Version-0"){
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "FOLDER VERSION: " $version_num
 			write-host "FIRST TIME"
