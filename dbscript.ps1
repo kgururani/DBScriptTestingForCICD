@@ -107,21 +107,25 @@ function script-execute {
 		if($version_num_check -eq 'True'){
 		    if($version_num -gt $db_version){
 				$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
-				for($i=0; $i -le ($sql_files.length -1); $i +=1){
-					Write-Host "EXEC: executing script: "$sql_files[$i]
-					$sub_version_num= $sql_files[$i].split('-')[0]
+				for($j=0; $j -le ($sql_files.length -1); $j +=1){
+					Write-Host "EXEC: executing script: "$sql_files[$j]
+					$sub_version_num= $sql_files[$j].split('-')[0]
 					write-host "TEST AGAIN: " $sub_version_num
 					$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 					if($sub_version_num_check -eq 'True'){
 						if($sub_version_num -gt $db_version){
-							$exec_file=$sql_files[$i]
+							$exec_file=$sql_files[$j]
 							$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
-							sqlcmd -S $h -U $uname -P $password -i $target
+							sqlcmd -S $h -U $uname -P $password -j $target
 							##Update current sub version from database table
-							sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-							$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+							sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET SUB_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+							$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 							write-host "INFO: updated version_num: " $db_updated_version
 						}
+					}
+					else {
+						Write-Error "ERROR: Filename does not match the format: " $sql_files[$j]
+						$sql_file_issue += $sql_files[$j]
 					}
 				}
 				##Update current sub version from database table
@@ -129,12 +133,13 @@ function script-execute {
 				$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }\
 				write-host "INFO: updated version_num: " $db_updated_version
 			}
-		}						
+		}
+		else {
+			Write-Error "ERROR: Foldername does not match the format: " $sql_folders[$i]
+			$sql_file_issue += $sql_files[$i]
+		}		
 	}
-	else {
-		Write-Error "ERROR: Filename does not match the format: " $sql_files[$i]
-		$sql_file_issue += $sql_files[$i]
-	}
+	
 	if($sql_file_issue -ne ""){
 	write-host "Files with issue in name convention"
 	$sql_file_issue
