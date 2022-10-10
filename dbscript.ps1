@@ -104,20 +104,9 @@ function script-execute {
 	
 	write-host "INFO: Version on Db: "$db_version
 	write-host "INFO: SUB Version on Db: "$db_sub_version
-	if($sql_folders[0] -ne 'Version-0'){
-		write-host "INFO: AGAIN: TRUE"
-	}
-	else{
-	write-host "INFO: AGAIN: FALSE"
-	}
-	if($sql_folders[0] -ne "Version-0'"){
-		write-host "INFO: AGAIN: TRUE1"
-	}
-	else{
-	write-host "INFO: AGAIN: FALSE1"
-	}
+	
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
-		if($sql_folders[$i] -ne "Version-0"){
+		if($sql_folders[$i] -ne 'Version-0'){
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "FOLDER VERSION: " $version_num
 			write-host "FIRST TIME"
@@ -152,11 +141,12 @@ function script-execute {
 					write-host "INFO: updated version_num: " $db_updated_version
 				}
 			}
-		}
-		else {
+			else {
 			Write-Error "ERROR: Foldername does not match the format: " $sql_folders[$i]
 			$sql_file_issue += $sql_files[$i]
-		}		
+			}	
+		}
+			
 	}
 	
 	if($sql_file_issue -ne ""){
