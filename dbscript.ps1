@@ -130,7 +130,7 @@ function script-execute {
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\Version-$version_num\$exec_file"
 								write-host "target: " $target
 
-								sqlcmd -S $h -U $uname -P $password -j $target
+								sqlcmd -S $h -U $uname -P $password -i $target
 								##Update current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET SUB_VERSION = $sub_version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								$db_updated_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
