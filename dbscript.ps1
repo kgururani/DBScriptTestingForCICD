@@ -92,7 +92,7 @@ function script-execute {
 		    Write-Warning " Table does not exist in DB. Executing first script"
 		    $first_script= ($sql_files | Measure -Min).Minimum
 		    $first_script
-		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
+		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
@@ -112,7 +112,7 @@ function script-execute {
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check -eq 'True'){
 				if($version_num -gt $db_version){
-					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
+					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\Version-$version_num\*.sql" -Leaf -Resolve
 					for($j=0; $j -le ($sql_files.length -1); $j +=1){
 						Write-Host "EXEC: executing script: "$sql_files[$j]
 						$sub_version_num= $sql_files[$j].split('-')[0]
