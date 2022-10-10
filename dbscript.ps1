@@ -135,14 +135,11 @@ function script-execute {
 		Write-Error "ERROR: Filename does not match the format: " $sql_files[$i]
 		$sql_file_issue += $sql_files[$i]
 	}
-}
 	if($sql_file_issue -ne ""){
-	        write-host "Files with issue in name convention"
-	        $sql_file_issue
+	write-host "Files with issue in name convention"
+	$sql_file_issue
 	}
-		
 }
-
 
 script-execute
 
