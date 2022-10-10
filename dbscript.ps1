@@ -92,7 +92,7 @@ function script-execute {
 		    Write-Warning " Table does not exist in DB. Executing first script"
 		    $first_script= ($sql_files | Measure -Min).Minimum
 		    $first_script
-		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\*.x\$first_script"
+		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\*\$first_script"
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
@@ -104,6 +104,7 @@ function script-execute {
 	write-host "INFO: Version on Db: "$db_version
 	write-host "INFO: SUB Version on Db: "$db_sub_version
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
+	
 		if($sql_folders[$i] -ne "version-0"){
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "FOLDER VERSION: " $version_num
