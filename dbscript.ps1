@@ -92,7 +92,7 @@ function script-execute {
 		    Write-Warning " Table does not exist in DB. Executing first script"
 		    $first_script= ($sql_files | Measure -Min).Minimum
 		    $first_script
-		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\*\$first_script"
+		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
