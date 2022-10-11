@@ -144,7 +144,7 @@ function script-execute {
 						}
 					}
 					##Update current version from database table
-					$version_num = 9.3.4
+					$version_num = 8.3.4
 					write-host "INFO: DELETE AFTER DEBUG: "$version_num
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = $version_num" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
