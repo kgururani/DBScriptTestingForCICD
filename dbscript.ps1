@@ -1,4 +1,5 @@
-
+#Project    MRM
+#Version 	1.0
 #read the arguments from the Command Line Interface
 
 param (
