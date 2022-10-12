@@ -1,5 +1,5 @@
 #Project    MRM
-#Version 	1.1
+#Version 	1.0
 #read the arguments from the Command Line Interface
 
 param (
@@ -89,14 +89,16 @@ function script-execute {
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$d.$table_name" -Q $query
 	if($table_val){
-		        write-host "PASS: Table exists"
+		        write-host "PASS: Version table already exists in DB with table name $d.$table_name "
 	}
 	else{
-		    Write-Warning " Table does not exist in DB. Executing first script"
-		    $first_script= ($sql_file | Measure -Min).Minimum
-		    $first_script
-		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
-			sqlcmd -S $h -U $uname -P $password -i $first_script_target
+		    Write-Warning " Version table does not exist in DB. Creating the table as $d.$table_name"
+		    #$first_script= ($sql_file | Measure -Min).Minimum
+		    #$first_script
+		    #$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
+			
+			sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; CREATE TABLE $d.$table_name([CURRENT_VERSION] [nvarchar](250) NOT NULL,[SUB_VERSION] [nvarchar](250) NOT NULL) | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			#sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
 
