@@ -85,7 +85,7 @@ function script-execute {
             END")
 	##Adding sql scripts in repo to array
 	$sql_folders = Split-Path -Path "$repo_dir\DataBaseFiles\*" -Leaf -Resolve
-	$sql_file= Split-Path -Path "$repo_dir\DataBaseFiles\Version-0\*.sql" -Leaf -Resolve
+	$sql_file= Split-Path -Path "$repo_dir\DataBaseFiles\version-0\*.sql" -Leaf -Resolve
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$d.$table_name" -Q $query
 	if($table_val){
@@ -95,7 +95,7 @@ function script-execute {
 		    Write-Warning " Version table does not exist in DB. Creating the table as $d.$table_name"
 		    $first_script= ($sql_file | Measure -Min).Minimum
 		    $first_script
-		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
+		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
 			
 			##sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; CREATE TABLE $d.$table_name([CURRENT_VERSION] [nvarchar](250) NOT NULL,[SUB_VERSION] [nvarchar](250) NOT NULL) | Format-List | Out-String | ForEach-Object { $_.Trim() }
 			sqlcmd -S $h -U $uname -P $password -i $first_script_target
@@ -110,14 +110,14 @@ function script-execute {
 	write-host "INFO: SUB Version on Db: "$db_sub_version
 	
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
-		if($sql_folders[$i] -ne 'Version-0'){
+		if($sql_folders[$i] -ne 'version-0'){
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "FOLDER VERSION: " $version_num
 			write-host "FIRST TIME"
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check -eq 'True'){
 				if($version_num -gt $db_version){
-					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\Version-$version_num\*.sql" -Leaf -Resolve
+					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "sql_files: " $sql_files
 
 					for($j=0; $j -le ($sql_files.length -1); $j +=1){
@@ -130,7 +130,7 @@ function script-execute {
 						if($sub_version_num_check -eq 'True'){
 							if($sub_version_num -gt $db_sub_version){
 								$exec_file=$sql_files[$j]
-								$target=Get-ChildItem "$repo_dir\DataBaseFiles\Version-$version_num\$exec_file"
+								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								write-host "target: " $target
 
 								sqlcmd -S $h -U $uname -P $password -i $target
