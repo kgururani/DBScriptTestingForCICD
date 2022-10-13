@@ -111,12 +111,16 @@ function script-execute {
 			$version_num= $sql_folders[$i].split('-')[1]
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check -eq 'True'){
+			
 				if($version_num -ge $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					for($j=0; $j -le ($sql_files.length -1); $j +=1){
 						$sub_version_num= $sql_files[$j].split('-')[0]
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check -eq 'True'){
+							if($version_num -gt $db_version){
+								db_sub_version=0
+							}
 							if($sub_version_num -gt $db_sub_version){
 								$exec_file=$sql_files[$j]
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
