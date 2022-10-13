@@ -113,10 +113,10 @@ function script-execute {
 		if($sql_folders[$i] -ne 'version-0'){
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "FOLDER VERSION: " $version_num
-			write-host "FIRST TIME"
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
+			write-host "FOLDER VERSION: " $version_num_check
 			if($version_num_check -eq 'True'){
-				if($version_num -gt $db_version){
+				if($version_num -ge $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "sql_files: " $sql_files
 
