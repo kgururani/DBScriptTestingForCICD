@@ -15,9 +15,10 @@ CREATE TABLE [dbo].[PIPELINE_CICD_CODE_VERSION](
 
 GO
 
+
 INSERT INTO [dbo].[PIPELINE_CICD_CODE_VERSION]
            ([CURRENT_VERSION]
-           ,[SUB_VERSION])])
+           ,[SUB_VERSION])
 		   
      VALUES
            ('0'
