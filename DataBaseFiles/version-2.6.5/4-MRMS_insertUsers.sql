@@ -7,7 +7,7 @@ INSERT INTO [dbo].[PIPELINE_CICD_TESTING]
            ,[EMAIL_ID])
 		   
      VALUES
-           ('Azure2'
-           ,'Testing2'
-           ,'testing2@deloitte.com')
+           ('Azure3'
+           ,'Testing3'
+           ,'testing3@deloitte.com')
 GO
