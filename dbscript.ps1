@@ -93,12 +93,12 @@ function script-execute {
 	}
 	else{
 		    Write-Warning " Version table does not exist in DB. Creating the table as $d.$table_name"
-		    #$first_script= ($sql_file | Measure -Min).Minimum
-		    #$first_script
-		    #$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
+		    $first_script= ($sql_file | Measure -Min).Minimum
+		    $first_script
+		    $first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\Version-0\$first_script"
 			
-			sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; CREATE TABLE $d.$table_name([CURRENT_VERSION] [nvarchar](250) NOT NULL,[SUB_VERSION] [nvarchar](250) NOT NULL) | Format-List | Out-String | ForEach-Object { $_.Trim() }
-			#sqlcmd -S $h -U $uname -P $password -i $first_script_target
+			##sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; CREATE TABLE $d.$table_name([CURRENT_VERSION] [nvarchar](250) NOT NULL,[SUB_VERSION] [nvarchar](250) NOT NULL) | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			sqlcmd -S $h -U $uname -P $password -i $first_script_target
 
 	}
 
