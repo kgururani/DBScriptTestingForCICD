@@ -114,24 +114,15 @@ function script-execute {
 			if($version_num_check -eq 'True'){
 			
 				if($version_num -ge $db_version){
-					$sql_files_count = (Get-ChildItem -File "$repo_dir\DataBaseFiles\version-$version_num\*.sql" | Measure-Object).Count
-					write-host "sql_files_count::"$sql_files_count
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "INFO: LOOP FILES:"$sql_files
-					for($j=0; $j -le ($sql_files_count -1); $j +=1){
+					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						write-host "INFO: version_num:"$version_num
 						write-host "INFO: INSODE LOOP FILES:"$sql_files
 						write-host "INFO:INSIDE LOOP:"$j
 						write-host "INFO: INSIDE LOOP FILES AGAIN:"$sql_files[$j]
-						write-host "INFO:LENGTH of sql_files: "$sql_files.length
-						if($sql_files_count -eq '1'){
-							write-host "INSIDE IF:"$sql_files
-							$sub_version_num= $sql_files.split('-')[0]
-						}
-						else{
-							write-host "INSIDE ELSE"
-							$sub_version_num= $sql_files[$j].split('-')[0]
-						}
+						
+						$sub_version_num= $sql_files[$j].split('-')[0]
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check -eq 'True'){
 							if($version_num -gt $db_version){
