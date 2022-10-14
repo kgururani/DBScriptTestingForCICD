@@ -118,7 +118,7 @@ function script-execute {
 					write-host "$sql_files_count::"$sql_files_count
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "INFO: LOOP FILES:"$sql_files
-					for($j=0; $j -le ($sql_files.length -1); $j +=1){
+					for($j=0; $j -le ($sql_files_count -1); $j +=1){
 						write-host "INFO: version_num:"$version_num
 						write-host "INFO: INSODE LOOP FILES:"$sql_files
 						write-host "INFO:INSIDE LOOP:"$j
