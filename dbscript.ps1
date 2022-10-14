@@ -140,7 +140,6 @@ function script-execute {
 								else{
 									$exec_file=$sql_files[$j]
 								}
-								$exec_file=$sql_files[$j]
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								sqlcmd -S $h -U $uname -P $password -i $target
 								##Update current sub version from database table
