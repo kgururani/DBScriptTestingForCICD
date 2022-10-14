@@ -134,6 +134,12 @@ function script-execute {
 								$db_sub_version = '0'
 							}
 							if($sub_version_num -gt $db_sub_version){
+								if($sql_files.count -eq '1'){
+									$exec_file=$sql_files
+								}
+								else{
+									$exec_file=$sql_files[$j]
+								}
 								$exec_file=$sql_files[$j]
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								sqlcmd -S $h -U $uname -P $password -i $target
