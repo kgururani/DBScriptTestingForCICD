@@ -117,6 +117,7 @@ function script-execute {
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "INFO: LOOP FILES:"$sql_files
 					for($j=0; $j -le ($sql_files.length -1); $j +=1){
+						write-host "INFO: version_num:"$version_num
 						write-host "INFO:INSIDE LOOP:"$j
 						write-host "INFO: INSIDE LOOP FILES:"$sql_files[$j]
 						$sub_version_num= $sql_files[$j].split('-')[0]
