@@ -118,8 +118,9 @@ function script-execute {
 					write-host "INFO: LOOP FILES:"$sql_files
 					for($j=0; $j -le ($sql_files.length -1); $j +=1){
 						write-host "INFO: version_num:"$version_num
+						write-host "INFO: INSODE LOOP FILES:"$sql_files
 						write-host "INFO:INSIDE LOOP:"$j
-						write-host "INFO: INSIDE LOOP FILES:"$sql_files[$j]
+						write-host "INFO: INSIDE LOOP FILES AGAIN:"$sql_files[$j]
 						$sub_version_num= $sql_files[$j].split('-')[0]
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check -eq 'True'){
