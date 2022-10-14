@@ -121,7 +121,7 @@ function script-execute {
 						write-host "INFO: INSODE LOOP FILES:"$sql_files
 						write-host "INFO:INSIDE LOOP:"$j
 						write-host "INFO: INSIDE LOOP FILES AGAIN:"$sql_files[$j]
-						if($sql_files.length eq '1'){
+						if($sql_files.length -eq '1'){
 							$sub_version_num= $sql_files.split('-')[0]
 						}
 						else{
