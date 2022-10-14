@@ -107,6 +107,7 @@ function script-execute {
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
 	
 	for($i=0; $i -le ($sql_folders.length -1); $i +=1){
+		write-host "INFO: LOOP:"$i
 		if($sql_folders[$i] -ne 'version-0'){
 			$version_num= $sql_folders[$i].split('-')[1]
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
@@ -114,7 +115,9 @@ function script-execute {
 			
 				if($version_num -ge $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
+					write-host "INFO: LOOP FILES:"$sql_files
 					for($j=0; $j -le ($sql_files.length -1); $j +=1){
+						write-host "INFO:INSIDE LOOP:"$j
 						$sub_version_num= $sql_files[$j].split('-')[0]
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check -eq 'True'){
