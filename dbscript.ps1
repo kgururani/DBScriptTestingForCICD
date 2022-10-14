@@ -115,7 +115,7 @@ function script-execute {
 			
 				if($version_num -ge $db_version){
 					$sql_files_count = (Get-ChildItem -File "$repo_dir\DataBaseFiles\version-$version_num\*.sql" | Measure-Object).Count
-					write-host "$sql_files_count::"$sql_files_count
+					write-host "sql_files_count::"$sql_files_count
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "INFO: LOOP FILES:"$sql_files
 					for($j=0; $j -le ($sql_files_count -1); $j +=1){
@@ -125,7 +125,7 @@ function script-execute {
 						write-host "INFO: INSIDE LOOP FILES AGAIN:"$sql_files[$j]
 						write-host "INFO:LENGTH of sql_files: "$sql_files.length
 						if($sql_files_count -eq '1'){
-							write-host "INSIDE IF"
+							write-host "INSIDE IF:"$sql_files
 							$sub_version_num= $sql_files.split('-')[0]
 						}
 						else{
