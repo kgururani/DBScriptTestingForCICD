@@ -50,8 +50,7 @@ param (
 	
 #Checking if version type is valid or not
 	$version_num_checkTest= $versionNumberToExecute -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
-	write-host "TEST version_num_checkTest AFTER: $version_num_checkTest"
-	if($version_num_checkTest -eq 'False'){
+	if(!$version_num_checkTest){
 		Write-Error "ERROR: Version field value is invalid. Please provide value on 'x.x.x' type in CI/CD Pipeline where x is number. Exiting now..."
 		exit 0
 	}
