@@ -10,7 +10,8 @@ GO
 
 CREATE TABLE [dbo].[PIPELINE_CICD_CODE_VERSION](
 	[CURRENT_VERSION] [nvarchar](250) NOT NULL,
-	[SUB_VERSION] [nvarchar](250) NOT NULL,
+	[PREVIOUS_VERSION] [nvarchar](250) NOT NULL,
+	[SUB_VERSION] [nvarchar](250) NOT NULL
 	)
 
 GO
@@ -18,10 +19,12 @@ GO
 
 INSERT INTO [dbo].[PIPELINE_CICD_CODE_VERSION]
            ([CURRENT_VERSION]
+	   ,[PREVIOUS_VERSION]
            ,[SUB_VERSION])
 		   
      VALUES
            ('0'
+	   ,'0'
            ,'0')
            
 GO
