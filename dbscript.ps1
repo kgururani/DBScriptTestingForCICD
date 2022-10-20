@@ -152,7 +152,7 @@ function script-execute {
 		if($sql_folders[$i] -ne 'version-0'){
 			$version_num= $sql_folders[$i].split('-')[1]
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
-			if($version_num_check -eq 'True'){
+			if($version_num_check){
 				if($version_num -eq $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "INFO: LOOP FILES:"$sql_files
@@ -169,10 +169,8 @@ function script-execute {
 							$sub_version_num= $sql_files[$j].split('-')[0]
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
-						if($sub_version_num_check -eq 'True'){
-							if($version_num -gt $db_version){
-								$db_sub_version = '0'
-							}
+						if($sub_version_num_check){
+							
 							if($sub_version_num -gt $db_sub_version){
 								if($sql_files.count -eq '1'){
 									$exec_file=$sql_files
@@ -198,7 +196,7 @@ function script-execute {
 					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					write-host "INFO: Updated version_num: " $db_previous_version
 				}
-				Write-Error "ERROR: Such Folder does not exist, please check the name again: " $sql_folders[$i]
+				Write-Error "ERROR: No folder exist , please check the version again: " $db_version 
 
 			}
 			else {
