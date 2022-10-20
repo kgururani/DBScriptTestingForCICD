@@ -1,5 +1,5 @@
 #Project    MRMS
-#Version 	1.0
+#Version 	1.1
 #read the arguments from the Command Line Interface
 
 param (
@@ -9,27 +9,58 @@ param (
 	$branch, 
 	$password, 
 	$repo_dir,
-	$table_name
+	$table_name,
+	$versionNumberToExecute
 	)
-
-if(!$d){
-	write-host "INFO: Database name is mandatory `nUsage is as follows: `ndb-script -h hostname(default USHYDGSREENIVAS\SQLSERVER) -p port(Default 1433) -uname db_username -password password -d database_name -branch branch_name -repo_dir sql_script_dir -table_name version_check_table)"
-}
-#checking if environment password is present. 
-if((!$password) -and (!$env_passwd)){
-	Write-Error "ERROR: Please use enviroment variable $MSPASSWORD or pass the password as a parameter using -p option. Exiting now"
-	exit 0
+#Checking if Database name is present or not
+	if(!$d){
+		Write-Error "ERROR: Database field is mandatory. Please provide value on 'db' option in CI/CD Pipeline. Exiting now..."
+		exit 0
 	}
-if(!$password){
-	write-host "INFO: Using the default environment password"
-	$Env:MSPASSWORD=$env_passwd
-}
-else{
-	write-host "INFO: Using the parameter password"
-	$Env:MSPASSWORD=$password
-}
+#Checking if host name is present or not
+	if(!$h){
+		Write-Error "ERROR: Host field is mandatory. Please provide value on 'hostname' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+#Checking if user name is present or not
+	if(!$uname){
+		Write-Error "ERROR: User field is mandatory. Please provide value on 'db_user' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+#Checking if branch name is present or not
+	if(!$branch){
+		Write-Error "ERROR: Branch field is mandatory. Please provide value on 'branch' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+#Checking if password is present or not
+	if(!$password){
+		Write-Error "ERROR: password field is mandatory. Please provide value on 'password' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+#Checking if table name is present or not
+	if(!$table_name){
+		Write-Error "ERROR: Table field is mandatory. Please provide value on 'table_name' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+#Checking if version name is present or not
+	if(!$versionNumberToExecute){
+		Write-Error "ERROR: Version field is mandatory. Please provide value on 'versionNumberToExecute' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+#Checking if version type is valid or not
+	$version_num_checkTest= $versionNumberToExecute -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
+	if($version_num_checkTest -eq 'False'){
+		Write-Error "ERROR: Version field value is invalid. Please provide value on 'x.x.x' type in CI/CD Pipeline where x is number. Exiting now..."
+		exit 0
+	}
 
-##connection_check
+#Checking if repo dir field is present or not
+	if(!$repo_dir){
+		Write-Error "ERROR: Repo Dir field is mandatory. Please provide value on 'repoDirPath' option in CI/CD Pipeline. Exiting now..."
+		exit 0
+	}
+
+## SQL Connection_check
 function Test-SqlConnection {
 param(
       [Parameter(Mandatory)]
@@ -60,10 +91,10 @@ $sqlConnection.Close()
 function script-execute {
 	$connection_check=Test-SqlConnection -ServerName $h -DatabaseName $d -Username $uname -PassWord $password
 	if($connection_check){
-	        write-host "PASS: SQL Connection successfull"
+		write-host "PASS: SQL Connection successfull"
 	}
-	else {
-	        Write-Error "ERROR: Connection failed"
+	else{
+	    Write-Error "ERROR: Connection failed. Please check the DB field values. Exiting now..."
 		exit 0
 	}
 
@@ -99,11 +130,20 @@ function script-execute {
 		sqlcmd -S $h -U $uname -P $password -i $first_script_target
 	}
 
-	##fetch current version from database table
+	#Update current version from database table
+	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = '$versionNumberToExecute'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	
+	##fetch current version ,previous version and sub-version from database table
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select PREVIOUS_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	$db_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	
-	write-host "INFO: Current Version on Db: "$db_version
+	if($db_version -ne $db_previous_version){
+		#Update current version from database table
+		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	}
+	write-host "INFO: Current Version on DB: " $db_version
+	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
 	
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){
@@ -112,8 +152,7 @@ function script-execute {
 			$version_num= $sql_folders[$i].split('-')[1]
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check -eq 'True'){
-			
-				if($version_num -ge $db_version){
+				if($version_num -eq $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "INFO: LOOP FILES:"$sql_files
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
@@ -153,16 +192,16 @@ function script-execute {
 							$sql_file_issue += $sql_files[$j]
 						}
 					}
-					##Update current version from database table
-					
-					
-					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					$db_updated_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					write-host "INFO: Updated version_num: " $db_updated_version
+					##Update previous version from database table
+					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET PREVIOUS_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+					write-host "INFO: Updated version_num: " $db_previous_version
 				}
+				Write-Error "ERROR: Such Folder does not exist, please check the name again: " $sql_folders[$i]
+
 			}
 			else {
-			Write-Error "ERROR: Foldername does not match the format: " $sql_folders[$i]
+			Write-Error "ERROR: Foldername does not match the format, Please check the format again : " $sql_folders[$i]
 			$sql_file_issue += $sql_files[$i]
 			}	
 		}
