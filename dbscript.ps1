@@ -1,5 +1,5 @@
-#Project    MRMS
-#Version 	1.1
+#Project    	MRMS
+#Version	1.1
 #read the arguments from the Command Line Interface
 
 param (
