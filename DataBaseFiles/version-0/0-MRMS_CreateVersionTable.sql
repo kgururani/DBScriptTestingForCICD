@@ -30,6 +30,6 @@ INSERT INTO [dbo].[PIPELINE_CICD_CODE_VERSION]
            ,'0'
 	   ,'0'
 	   ,CURRENT_TIMESTAMP
-	   ,NULL)
+	   ,'')
            
 GO
