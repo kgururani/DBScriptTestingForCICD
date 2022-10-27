@@ -149,21 +149,13 @@ function script-execute {
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
 	
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){
-		write-host "INFO: LOOP:"$i
 		if($sql_folders[$i] -ne 'version-0'){			
 			$version_num= $sql_folders[$i].split('-')[1]
-			write-host "INFO: LOOP:"$version_num
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
-					write-host "INFO: LOOP FILES:"$sql_files
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
-						write-host "INFO: version_num:"$version_num
-						write-host "INFO: INSODE LOOP FILES:"$sql_files
-						write-host "INFO:INSIDE LOOP:"$j
-						write-host "INFO: INSIDE LOOP FILES AGAIN:"$sql_files[$j]
-						
 						if($sql_files.count -eq '1'){
 							$sub_version_num= $sql_files.split('-')[0]
 						}
@@ -172,7 +164,6 @@ function script-execute {
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check){
-							
 							if($sub_version_num -gt $db_sub_version){
 								if($sql_files.count -eq '1'){
 									$exec_file=$sql_files
@@ -185,7 +176,6 @@ function script-execute {
 								##Update current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET SUB_VERSION = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								$db_updated_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								write-host "INFO: Updated Sub version_num: " $db_updated_sub_version
 							}
 						}
 						else {
@@ -196,7 +186,6 @@ function script-execute {
 					##Update previous version from database table
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET PREVIOUS_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					write-host "INFO: Updated version_num: " $db_previous_version
 					exit 0
 				}
 				##Write-Error "ERROR: No folder exist , please check the version again: " $db_version 
@@ -217,4 +206,3 @@ function script-execute {
 }
 
 script-execute
-
