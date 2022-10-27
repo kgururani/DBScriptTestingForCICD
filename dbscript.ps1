@@ -137,12 +137,13 @@ function script-execute {
 	##fetch current version ,previous version and sub-version from database table
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select PREVIOUS_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-	$db_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	
 	if($db_version -ne $db_previous_version){
 		#Update current version from database table
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET SUB_VERSION = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	}
+	$db_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select SUB_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+
 	write-host "INFO: Current Version on DB: " $db_version
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
