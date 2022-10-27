@@ -141,7 +141,7 @@ function script-execute {
 	
 	if($db_version -ne $db_previous_version){
 		#Update current version from database table
-		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET CURRENT_VERSION = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET SUB_VERSION = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	}
 	write-host "INFO: Current Version on DB: " $db_version
 	write-host "INFO: Previous Version on Db: "$db_previous_version
