@@ -138,7 +138,7 @@ function script-execute {
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select PREVIOUS_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	if($db_version -lt $db_previous_version){
-		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'FAILED'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'ERROR: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		Write-Error "ERROR: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details.."
 		exit 1
 	}
@@ -205,16 +205,16 @@ function script-execute {
 				
 			}
 			else {
+				sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'ERROR: $sql_folders[$i] Foldername does not match the format, Please check the format again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 				Write-Error "ERROR: $sql_folders[$i] Foldername does not match the format, Please check the format again.."
-				sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'FAILED'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 				$sql_file_issue += $sql_files[$i]
 			}	
 		}	
 	}
 	write-host "TEST::: $temp"
 	if($temp -eq '0'){
-		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'FAILED'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
 		exit 1
 	}
 	if($sql_file_issue -ne ""){
