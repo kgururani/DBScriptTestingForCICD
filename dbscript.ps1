@@ -213,7 +213,7 @@ function script-execute {
 	}
 	write-host "TEST::: $temp"
 	if($temp -eq '0'){
-		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'FAILED'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'ERROR: No such folder exist which contains version 2.6.7 , please check again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
 		exit 1
 	}
