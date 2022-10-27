@@ -193,9 +193,9 @@ function script-execute {
 					}
 					##Update previous version from database table
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET PREVIOUS_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+					##$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					write-host "INFO: Updated version_num: " $db_previous_version
-					exit 0
+					##exit 0
 				}
 				Write-Error "ERROR: No folder exist , please check the version again: " $db_version 
 				exit 0
