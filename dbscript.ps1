@@ -153,7 +153,6 @@ function script-execute {
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "INFO: LOOP:"$version_num
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
-			write-host "INFO: LOOP:"$version_num_check
 			if($version_num_check){
 				if($version_num -eq $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
@@ -195,16 +194,16 @@ function script-execute {
 					}
 					##Update previous version from database table
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET PREVIOUS_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					##$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					write-host "INFO: Updated version_num: " $db_previous_version
-					##exit 0
+					exit 0
 				}
-				Write-Error "ERROR: No folder exist , please check the version again: " $db_version 
-				exit 0
+				##Write-Error "ERROR: No folder exist , please check the version again: " $db_version 
+				##exit 0
 			}
 			else {
-			Write-Error "ERROR: Foldername does not match the format, Please check the format again : " $sql_folders[$i]
-			$sql_file_issue += $sql_files[$i]
+				Write-Error "ERROR: Foldername does not match the format, Please check the format again : " $sql_folders[$i]
+				$sql_file_issue += $sql_files[$i]
 			}	
 		}
 			
