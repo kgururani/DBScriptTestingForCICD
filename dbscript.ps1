@@ -147,13 +147,14 @@ function script-execute {
 	write-host "INFO: Current Version on DB: " $db_version
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
-	
+	$temp = '0'
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){
 		if($sql_folders[$i] -ne 'version-0'){			
 			$version_num= $sql_folders[$i].split('-')[1]
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
+					$temp = '1'
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						if($sql_files.count -eq '1'){
@@ -188,17 +189,18 @@ function script-execute {
 					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					exit 0
 				}
-				##Write-Error "ERROR: No folder exist , please check the version again: " $db_version 
-				##exit 0
+				
 			}
 			else {
 				Write-Error "ERROR: Foldername does not match the format, Please check the format again : " $sql_folders[$i]
 				$sql_file_issue += $sql_files[$i]
 			}	
-		}
-			
+		}	
 	}
-	
+	if($temp=='0'){
+		Write-Error "ERROR: No such version folder exist , please check it again: " $db_version 
+		exit 0
+	}
 	if($sql_file_issue -ne ""){
 	write-host "Files with issue in name convention"
 	$sql_file_issue
@@ -206,3 +208,4 @@ function script-execute {
 }
 
 script-execute
+
