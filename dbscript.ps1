@@ -137,6 +137,10 @@ function script-execute {
 	##fetch current version ,previous version and sub-version from database table
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select PREVIOUS_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	if($db_version -lt $db_previous_version){
+		write-host "INFO: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details.."
+		exit 0
+	}
 	
 	if($db_version -ne $db_previous_version){
 		#Update current version from database table
