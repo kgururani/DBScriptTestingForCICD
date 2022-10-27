@@ -225,9 +225,13 @@ function script-execute {
 
 $command.Transaction = $connection.BeginTransaction()
 try{
+	write-host "Try1"
 	script-execute
+	write-host "Try2"
+
 }
 catch{
+	write-host "Catch"
 	$command.Transaction.Rollback()
 	throw
 }
