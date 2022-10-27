@@ -231,6 +231,8 @@ try{
 
 }
 catch{
-	write-host "Catch"
+	write-host "Catch1"
 	Undo-Transaction
+	write-host "Catch2"
+
 }
