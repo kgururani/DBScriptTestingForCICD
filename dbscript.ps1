@@ -223,5 +223,11 @@ function script-execute {
 	}
 }
 
-script-execute
-
+$command.Transaction = $connection.BeginTransaction()
+try{
+	script-execute
+}
+catch{
+	$command.Transaction.Rollback()
+	throw
+}
