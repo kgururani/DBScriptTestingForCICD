@@ -152,9 +152,13 @@ function script-execute {
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
 	$temp = '0'
+	write-host "INFO: Countt:: $sql_folders.count"
+	write-host "INFO: Files: $sql_folders"
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){
+		write-host "INFO: Check::: $sql_folders[$i]"		
+
 		if($sql_folders[$i] -ne 'version-0'){	
-			write-host "INFO: Current: $sql_folders[$i]"		
+			write-host "INFO: Value::$i and $sql_folders[$i]"		
 			$version_num= $sql_folders[$i].split('-')[1]
 			write-host "INFO: Current: $version_num"
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
