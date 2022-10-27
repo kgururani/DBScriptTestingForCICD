@@ -15,50 +15,50 @@ param (
 #Checking if Database name is present or not
 	if(!$d){
 		Write-Error "ERROR: Database field is mandatory. Please provide value on 'db' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 #Checking if host name is present or not
 	if(!$h){
 		Write-Error "ERROR: Host field is mandatory. Please provide value on 'hostname' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 #Checking if user name is present or not
 	if(!$uname){
 		Write-Error "ERROR: User field is mandatory. Please provide value on 'db_user' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 #Checking if branch name is present or not
 	if(!$branch){
 		Write-Error "ERROR: Branch field is mandatory. Please provide value on 'branch' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 #Checking if password is present or not
 	if(!$password){
 		Write-Error "ERROR: password field is mandatory. Please provide value on 'password' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 #Checking if table name is present or not
 	if(!$table_name){
 		Write-Error "ERROR: Table field is mandatory. Please provide value on 'table_name' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 #Checking if version name is present or not
 	if(!$versionNumberToExecute){
 		Write-Error "ERROR: Version field is mandatory. Please provide value on 'versionNumberToExecute' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 	
 #Checking if version type is valid or not
 	$version_num_checkTest= $versionNumberToExecute -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 	if(!$version_num_checkTest){
 		Write-Error "ERROR: Version field value is invalid. Please provide value on 'x.x.x' format in CI/CD Pipeline where x is version numbers. Exiting now..."
-		exit 0
+		exit 1
 	}
 
 #Checking if repo dir field is present or not
 	if(!$repo_dir){
 		Write-Error "ERROR: Repo Dir field is mandatory. Please provide value on 'repoDirPath' option in CI/CD Pipeline. Exiting now..."
-		exit 0
+		exit 1
 	}
 
 ## SQL Connection_check
@@ -96,7 +96,7 @@ function script-execute {
 	}
 	else{
 	    Write-Error "ERROR: Connection failed. Please check the DB field values. Exiting now..."
-		exit 0
+		exit 1
 	}
 
 	if(!$branch){
@@ -140,7 +140,7 @@ function script-execute {
 	if($db_version -lt $db_previous_version){
 		Write-Error "ERROR: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details.."
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'ERROR: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-		exit 0
+		exit 1
 	}
 	
 	if($db_version -ne $db_previous_version){
@@ -200,7 +200,7 @@ function script-execute {
 					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					write-host "I am here"
-					exit 0
+					exit 1
 				}
 				
 			}
@@ -215,7 +215,7 @@ function script-execute {
 	if($temp -eq '0'){
 		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'ERROR: No such folder exist which contains version $db_version , please check again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-		exit 0
+		exit 1
 	}
 	if($sql_file_issue -ne ""){
 	write-host "Files with issue in name convention"
