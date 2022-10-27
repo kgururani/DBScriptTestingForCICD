@@ -200,7 +200,7 @@ function script-execute {
 					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					write-host "I am here"
-					exit 1
+					exit 0
 				}
 				
 			}
@@ -225,7 +225,7 @@ function script-execute {
 
 try{
 	Start-Transaction
-	write-host "Try1"
+	write-host Start-Transaction
 	script-execute
 	write-host "Try2"
 
