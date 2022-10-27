@@ -149,9 +149,11 @@ function script-execute {
 	
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){
 		write-host "INFO: LOOP:"$i
-		if($sql_folders[$i] -ne 'version-0'){
+		if($sql_folders[$i] -ne 'version-0'){			
 			$version_num= $sql_folders[$i].split('-')[1]
+			write-host "INFO: LOOP:"$version_num
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
+			write-host "INFO: LOOP:"$version_num_check
 			if($version_num_check){
 				if($version_num -eq $db_version){
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
