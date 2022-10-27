@@ -138,8 +138,8 @@ function script-execute {
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select PREVIOUS_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	if($db_version -lt $db_previous_version){
-		Write-Error "ERROR: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details.."
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'FAILED'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		Write-Error "ERROR: Cannot execute Pipeline as given version $db_version is lesser than the previous version $db_previous_version , Please check the details.."
 		exit 1
 	}
 	
