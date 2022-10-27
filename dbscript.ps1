@@ -198,7 +198,7 @@ function script-execute {
 		}	
 	}
 	if($temp -eq '0'){
-		Write-Error "ERROR: No such version folder exist , please check it again: " $db_version 
+		Write-Error "ERROR: No such folder exist , please check again: $db_version"
 		exit 0
 	}
 	if($sql_file_issue -ne ""){
