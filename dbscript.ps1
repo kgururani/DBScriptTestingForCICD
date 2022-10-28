@@ -153,15 +153,11 @@ function script-execute {
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Sub Version on Db: "$db_sub_version
 	$temp = '0'
-	write-host "INFO: Countt:: $sql_folders.count"
-	write-host "INFO: Files: $sql_folders"
-	for($i=0; $i -le ($sql_folders.count -1); $i +=1){
-		write-host "INFO: Check::: $sql_folders[$i]"		
 
-		if($sql_folders[$i] -ne 'version-0'){	
-			write-host "INFO: Value::$i and $sql_folders[$i]"		
+	for($i=0; $i -le ($sql_folders.count -1); $i +=1){		
+
+		if($sql_folders[$i] -ne 'version-0'){		
 			$version_num= $sql_folders[$i].split('-')[1]
-			write-host "INFO: Current: $version_num"
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
@@ -199,7 +195,6 @@ function script-execute {
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET PREVIOUS_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; select CURRENT_VERSION from $d.$table_name" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					write-host "I am here"
 					exit 0
 				}
 				
@@ -211,7 +206,6 @@ function script-execute {
 			}	
 		}	
 	}
-	write-host "TEST::: $temp"
 	if($temp -eq '0'){
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$table_name" -Q "set nocount on; update $d.$table_name SET MESSAGE = 'ERROR: No such folder exist which contains version 2.6.7 , please check again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
