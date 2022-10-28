@@ -8,6 +8,6 @@ INSERT INTO [dbo].[PIPELINE_CICD_TESTING]
 		   
      VALUES
            ('Azure22'
-           ,'Testing022'
-           ,'testing011m@deloitte.com')
+           ,'Testing22'
+           ,'testing22m@deloitte.com')
 GO
