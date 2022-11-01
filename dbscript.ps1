@@ -1,5 +1,5 @@
 #Project    MRMS
-#Version 	1.0
+#Version 	1.1
 #read the arguments from the Command Line Interface
 
 param (
@@ -149,11 +149,11 @@ function script-execute {
 								#UPDATE number of files executed from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								if($message -contains "rows affected"){
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: $message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = ERROR: '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 1
 								}
 								else{
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS: $message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = SUCCESS: '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
 								}
 							}
