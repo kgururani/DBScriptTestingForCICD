@@ -11,50 +11,6 @@ param (
 	$repo_dir,
 	$versionNumberToExecute
 	)
-#Checking if Database name is present or not
-	if(!$d){
-		Write-Error "ERROR: Database field is mandatory. Please provide value on 'db' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
-#Checking if host name is present or not
-	if(!$h){
-		Write-Error "ERROR: Host field is mandatory. Please provide value on 'hostname' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
-#Checking if user name is present or not
-	if(!$uname){
-		Write-Error "ERROR: User field is mandatory. Please provide value on 'db_user' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
-#Checking if branch name is present or not
-	if(!$branch){
-		Write-Error "ERROR: Branch field is mandatory. Please provide value on 'branch' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
-#Checking if password is present or not
-	if(!$password){
-		Write-Error "ERROR: password field is mandatory. Please provide value on 'password' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
-
-#Checking if version name is present or not
-	if(!$versionNumberToExecute){
-		Write-Error "ERROR: Version field is mandatory. Please provide value on 'versionNumberToExecute' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
-	
-#Checking if version type is valid or not
-	$version_num_checkTest= $versionNumberToExecute -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
-	if(!$version_num_checkTest){
-		Write-Error "ERROR: Version field value is invalid. Please provide value on 'x.x.x' format in CI/CD Pipeline where x is version numbers. Exiting now..."
-		exit 1
-	}
-
-#Checking if repo dir field is present or not
-	if(!$repo_dir){
-		Write-Error "ERROR: Repo Dir field is mandatory. Please provide value on 'repoDirPath' option in CI/CD Pipeline. Exiting now..."
-		exit 1
-	}
 
 ## SQL Connection_check
 function Test-SqlConnection {
@@ -153,7 +109,7 @@ function script-execute {
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Version on DB: " $db_version
 	write-host "INFO: Executed Files Sequence Number: "$db_files_seq
-	$checkFolderExist = 'false'
+	$checkFolderExist = $false
 
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){		
 
@@ -162,7 +118,7 @@ function script-execute {
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
-					$checkFolderExist = 'true'
+					$checkFolderExist = $true
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						if($sql_files.count -eq '1'){
