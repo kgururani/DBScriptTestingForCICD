@@ -137,7 +137,8 @@ function script-execute {
 									$exec_file=$sql_files[$j]
 								}
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
-								sqlcmd -S $h -U $uname -P $password -i $target
+								$message = sqlcmd -S $h -U $uname -P $password -i $target
+								write-host "MESSAGE::: $message"
 								##UPDATE current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
@@ -162,9 +163,8 @@ function script-execute {
 					
 					}
 
-					##UPDATE previous version from database table
-					##$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					##sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET PREVIOUS_VERSION = '$db_previous_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+					
+					
 					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					exit 0
 				}
