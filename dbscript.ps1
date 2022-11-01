@@ -3,13 +3,13 @@
 #read the arguments from the Command Line Interface
 
 param (
-	$d='BACMRMQA',
-	$h='USHDCADVDSW0054.dev.sltc.com',
-	$uname='MRMDev',
-	$branch ='main',
-	$password='HYVSgojRw34JPbOw119H',
-	$repo_dir='C:\AUTOMATION_FRAMEWORK_DOCUMENTS\testing',
-	$versionNumberToExecute='2.6.5'
+	$d,
+	$h,
+	$uname,
+	$branch, 
+	$password, 
+	$repo_dir,
+	$versionNumberToExecute
 	)
 #Checking if Database name is present or not
 	if(!$d){
