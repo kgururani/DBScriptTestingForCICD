@@ -130,7 +130,7 @@ function script-execute {
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check){
-							write-host "INFO: 22"
+							write-host "INFO: 22 -- $sub_version_num" 
 							if($sub_version_num -gt $db_files_seq){
 							write-host "INFO: 33"
 								if($sql_files.count -eq '1'){
