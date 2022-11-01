@@ -40,12 +40,3 @@ INSERT INTO [dbo].[PIPELINE_CICD_CODE_VERSION]
 		)
            
 GO
-INSERT INTO [dbo].[PIPELINE_CICD_VERSION_LOGS]
-           ([VERSIONS]
-           ,[NUMBER_OF_FILES_EXECUTED])
-		   
-     VALUES
-           ('0'
-           ,'0')
-	   
-GO
