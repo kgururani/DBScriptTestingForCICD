@@ -3,13 +3,13 @@
 #read the arguments from the Command Line Interface
 
 param (
-	$d,
-	$h,
-	$uname,
-	$branch, 
-	$password, 
-	$repo_dir,
-	$versionNumberToExecute
+	$d='BACMRMQA',
+	$h='USHDCADVDSW0054.dev.sltc.com',
+	$uname='MRMDev',
+	$branch ='main',
+	$password='HYVSgojRw34JPbOw119H',
+	$repo_dir='C:\AUTOMATION_FRAMEWORK_DOCUMENTS\testing',
+	$versionNumberToExecute='2.6.5'
 	)
 #Checking if Database name is present or not
 	if(!$d){
@@ -126,110 +126,6 @@ function script-execute {
 		$first_script
 		$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
 		sqlcmd -S $h -U $uname -P $password -i $first_script_target
-	}
-
-	#Update previous and current version from database table
-	$db_current_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET PREVIOUS_VERSION = '$db_current_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET CURRENT_VERSION = '$versionNumberToExecute'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-	##fetch current version ,previous version and sub-version from database table
-	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-
-	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT PREVIOUS_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-
-	
-	
-	if($db_version -ne $db_previous_version){
-		#Check if version is already exist
-		$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = $db_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-		if(count_Rows -eq '1'){
-			#Update number of files executed from database table
-			$number_Of_Files_Executed =sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; SELECT NUMBER_OF_FILES_EXECUTED from $d.$version_table_logs WHERE VERSIONS = $db_version "" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ# = $number_Of_Files_Executed " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-		}
-		else{
-			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ# = '0' " | Format-List | Out-String | ForEach-Object { $_.Trim() }	
-		}
-	}
-	$db_files_seq#=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ# from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-
-	write-host "INFO: Previous Version on Db: "$db_previous_version
-	write-host "INFO: Current Version on DB: " $db_version
-	write-host "INFO: Executed Files Sequence Number: "$db_files_seq#
-	$checkFolderExist = false
-
-	for($i=0; $i -le ($sql_folders.count -1); $i +=1){		
-
-		if($sql_folders[$i] -ne 'version-0'){		
-			$version_num= $sql_folders[$i].split('-')[1]
-			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
-			if($version_num_check){
-				if($version_num -eq $db_version){
-					$checkFolderExist = true
-					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
-					for($j=0; $j -le ($sql_files.count -1); $j +=1){
-						if($sql_files.count -eq '1'){
-							$sub_version_num= $sql_files.split('-')[0]
-						}
-						else{
-							$sub_version_num= $sql_files[$j].split('-')[0]
-						}
-						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
-						if($sub_version_num_check){
-							if($sub_version_num -gt $db_files_seq#){
-								if($sql_files.count -eq '1'){
-									$exec_file=$sql_files
-								}
-								else{
-									$exec_file=$sql_files[$j]
-								}
-								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
-								sqlcmd -S $h -U $uname -P $password -i $target
-								##Update current sub version from database table
-								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ# = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								$db_updated_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ# from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-							}
-						}
-						else {
-							Write-Error "ERROR: Filename does not match the format: " $sql_files[$j]
-							$sql_file_issue += $sql_files[$j]
-						}
-					}
-					#Check if version is already exist
-					$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = $db_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					if(count_Rows -eq '1'){
-						#Update number of files executed from database table
-						sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; update $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = $db_updated_sub_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					}
-					else{
-						#Insert version number and number of files executed from database table
-						sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; INSERT INTO $d.$version_table_logs(VERSIONS,NUMBER_OF_FILES_EXECUTED) VALUES ($db_version,$db_updated_sub_version) " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					
-					}
-
-					##Update previous version from database table
-					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET PREVIOUS_VERSION = '$version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					exit 0
-				}
-				
-			}
-			else {
-				sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET MESSAGE = 'ERROR: $sql_folders[$i] Foldername does not match the format, Please check the format again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-				Write-Error "ERROR: $sql_folders[$i] Foldername does not match the format, Please check the format again.."
-				$sql_file_issue += $sql_files[$i]
-			}	
-		}	
-	}
-	if(!$checkFolderExist){
-		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET MESSAGE = 'ERROR: No such folder exist which contains version 2.6.7 , please check again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
-		exit 1
-	}
-	if($sql_file_issue -ne ""){
-	write-host "Files with issue in name convention"
-	$sql_file_issue
 	}
 }
 
