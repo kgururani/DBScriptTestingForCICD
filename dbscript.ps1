@@ -146,6 +146,16 @@ function script-execute {
 								##UPDATE current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								#UPDATE number of files executed from database table
+								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								if($message -contains "rows affected"){
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: $message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									exit 1
+								}
+								else{
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS: $message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									exit 0
+								}
 							}
 						}
 						else {
@@ -156,10 +166,7 @@ function script-execute {
 					#Check if version is already exist
 					$count_Rows_version = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = '$db_version' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					if($count_Rows_version -eq '1'){
-						if($sub_version_num -gt $db_files_seq){
-							#UPDATE number of files executed from database table
-							sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-						}
+						
 					}
 					else{
 						#Insert version number and number of files executed from database table
@@ -169,8 +176,6 @@ function script-execute {
 
 					
 					
-					sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					exit 0
 				}
 				
 			}
