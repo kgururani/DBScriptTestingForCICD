@@ -127,7 +127,17 @@ function script-execute {
 		$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
 		sqlcmd -S $h -U $uname -P $password -i $first_script_target
 	}
+	#Update previous and current version from database table
+	$db_current_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET PREVIOUS_VERSION = '$db_current_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET CURRENT_VERSION = '$versionNumberToExecute'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	##fetch current version ,previous version and sub-version from database table
+	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+
+	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT PREVIOUS_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+
 }
+
 
 script-execute
 
