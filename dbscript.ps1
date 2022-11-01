@@ -136,7 +136,8 @@ function script-execute {
 	$db_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT PREVIOUS_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-	
+	write-host "INFO: Previous Version on Db: "$db_previous_version
+	write-host "INFO: Current Version on DB: " $db_version
 	if($db_version -ne $db_previous_version){
 		#Check if version is already exist
 		$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = $db_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
