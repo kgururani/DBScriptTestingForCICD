@@ -11,6 +11,7 @@ GO
 CREATE TABLE [dbo].[PIPELINE_CICD_CODE_VERSION](
 	[PREVIOUS_VERSION] [nvarchar](250) NOT NULL,
 	[CURRENT_VERSION] [nvarchar](250) NOT NULL,
+	[EXECUTED_FILE_SEQ#] [nvarchar](250) NOT NULL,
 	[TIMESTAMP] [nvarchar](250) NOT NULL,
 	[MESSAGE] [nvarchar](250) NOT NULL
 	)
@@ -26,11 +27,13 @@ GO
 INSERT INTO [dbo].[PIPELINE_CICD_CODE_VERSION]
            ([PREVIOUS_VERSION]
 	   ,[CURRENT_VERSION]
+	   ,[EXECUTED_FILE_SEQ#]
 	   ,[TIMESTAMP]
 	   ,[MESSAGE])
 		   
      VALUES
            ('0'
+			,'0'
 			,'0'
 			,CURRENT_TIMESTAMP
 			,''
