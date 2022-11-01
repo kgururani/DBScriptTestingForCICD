@@ -143,11 +143,6 @@ function script-execute {
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								$message = sqlcmd -S $h -U $uname -P $password -i $target
 								write-host "MESSAGE::: $message"
-								##UPDATE current sub version from database table
-								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								#UPDATE number of files executed from database table
-								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								if($message -contains "*rows affected*"){
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = ERROR: '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 1
@@ -156,6 +151,12 @@ function script-execute {
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = SUCCESS: '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
 								}
+								##UPDATE current sub version from database table
+								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								#UPDATE number of files executed from database table
+								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								i
 							}
 						}
 						else {
