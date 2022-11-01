@@ -138,6 +138,21 @@ function script-execute {
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT PREVIOUS_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Version on DB: " $db_version
+	if($db_version -ne $db_previous_version){
+		#Check if version is already exist
+		$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = $db_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		write-host "INFO: count_Rows::::$count_Rows"
+
+		if(count_Rows -eq '1'){
+			#UPDATE number of files executed from database table
+			$number_Of_Files_Executed =sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; SELECT NUMBER_OF_FILES_EXECUTED from $d.$version_table_logs WHERE VERSIONS = $db_version "" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			write-host "INFO: number_Of_Files_Executed::::$number_Of_Files_Executed"
+			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = $number_Of_Files_Executed " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		}
+		else{
+			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		}
+	}
 	
 }
 
