@@ -148,7 +148,7 @@ function script-execute {
 								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								#UPDATE number of files executed from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								if($message -contains "rows affected"){
+								if($message -contains "*rows affected*"){
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = ERROR: '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 1
 								}
