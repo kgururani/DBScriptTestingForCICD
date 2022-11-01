@@ -175,7 +175,6 @@ function script-execute {
 			}	
 		}	
 	}
-	write-host "checkFolderExist:::: $checkFolderExist !$checkFolderExist"
 	if(!$checkFolderExist){
 		sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: No such folder exist which contains version 2.6.7 , please check again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		Write-Error "ERROR: No such folder exist which contains version $db_version , please check again.. "
