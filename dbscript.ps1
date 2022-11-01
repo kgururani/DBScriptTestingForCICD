@@ -194,7 +194,7 @@ function script-execute {
 					}
 					#Check if version is already exist
 					$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = $db_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-					if(count_Rows -eq '1'){
+					if($count_Rows -eq '1'){
 						#UPDATE number of files executed from database table
 						sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					}
