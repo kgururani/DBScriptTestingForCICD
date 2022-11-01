@@ -118,6 +118,7 @@ function script-execute {
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
+					write-host "INFO: 11"
 					$checkFolderExist = $true
 					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
@@ -129,13 +130,16 @@ function script-execute {
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check){
+							write-host "INFO: 22"
 							if($sub_version_num -gt $db_files_seq){
+							write-host "INFO: 33"
 								if($sql_files.count -eq '1'){
 									$exec_file=$sql_files
 								}
 								else{
 									$exec_file=$sql_files[$j]
 								}
+								write-host "INFO: 44"
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								$message = sqlcmd -S $h -U $uname -P $password -i $target
 								write-host "MESSAGE::: $message"
