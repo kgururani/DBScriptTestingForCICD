@@ -144,11 +144,11 @@ function script-execute {
 								$message = sqlcmd -S $h -U $uname -P $password -i $target
 								write-host "MESSAGE::: $message"
 								if($message -like "*rows affected*"){
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 1
 								}
 								else{
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
 								}
 								##UPDATE current sub version from database table
