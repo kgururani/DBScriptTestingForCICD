@@ -118,7 +118,7 @@ function script-execute {
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$d.$version_table" -Q $query
 	if($table_val){
-		write-host "PASS: Version table already exists in DB with table name $d.$version_table "
+		write-host "PASS: Version table and Version log table already exists in DB with table names 1. $d.$version_table ,2. $d.$version_table_logs"
 	}
 	else{
 	    Write-Warning " Version table does not exist in DB. Creating the table as $d.$version_table"
@@ -127,6 +127,7 @@ function script-execute {
 		$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
 		sqlcmd -S $h -U $uname -P $password -i $first_script_target
 	}
+
 	#Update previous and current version from database table
 	$db_current_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT CURRENT_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET PREVIOUS_VERSION = '$db_current_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
@@ -136,6 +137,20 @@ function script-execute {
 
 	$db_previous_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT PREVIOUS_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 
+	
+	
+	if($db_version -ne $db_previous_version){
+		#Check if version is already exist
+		$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = $db_version " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		if(count_Rows -eq '1'){
+			#Update number of files executed from database table
+			$number_Of_Files_Executed =sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; SELECT NUMBER_OF_FILES_EXECUTED from $d.$version_table_logs WHERE VERSIONS = $db_version "" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ# = $number_Of_Files_Executed " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+		}
+		else{
+			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ# = '0' " | Format-List | Out-String | ForEach-Object { $_.Trim() }	
+		}
+	}
 }
 
 
