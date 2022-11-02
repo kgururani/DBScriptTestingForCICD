@@ -142,8 +142,9 @@ function script-execute {
 								write-host "INFO: 44"
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								$message = sqlcmd -S $h -U $uname -P $password -i $target
-								write-host "MESSAGE::: $message"
-								write-host "Krishan BreakPoint"
+								write-host "Before BreakPoint"
+								write-host "MESSAGE::: [string]$message"
+								write-host "After BreakPoint"
 								if($message -like "*Msg*"){
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: Please check sql file'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
