@@ -11,7 +11,4 @@ INSERT INTO [dbo].[PIPELINE_CICD_TESTING]
            ,'Testing3'
            ,'testing3@deloitte.com')
 GO
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
+
