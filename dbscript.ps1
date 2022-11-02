@@ -140,11 +140,11 @@ function script-execute {
 								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
 								write-host "MESSAGE:::$message"
 								if($message -like "*Msg*"){
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = '$message' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = "$message" " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
 								}
 								else{
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS: + $message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS:' + '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								}
 								##UPDATE current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
