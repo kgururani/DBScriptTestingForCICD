@@ -141,7 +141,7 @@ function script-execute {
 								}
 								write-host "INFO: 44"
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
-								$message = sqlcmd -S $h -U $uname -P $password -i $target
+								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
 								write-host "Before BreakPoint"
 								write-host "MESSAGE::: [string]$message"
 								write-host "After BreakPoint"
