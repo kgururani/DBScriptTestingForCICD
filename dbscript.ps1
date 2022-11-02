@@ -143,13 +143,12 @@ function script-execute {
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								$message = sqlcmd -S $h -U $uname -P $password -i $target
 								write-host "MESSAGE::: $message"
-								if($message -like "*rows affected*"){
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-									exit 1
-								}
-								else{
+								if($message -like "*Msg*"){
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: Please check sql file'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
+								}
+								else{
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								}
 								##UPDATE current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
