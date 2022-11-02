@@ -81,7 +81,7 @@ function script-execute {
 	    $first_script= ($sql_file | Measure -Min).Minimum
 		$first_script
 		$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
-		sqlcmd -S $h -U $uname -P $password -i $first_script_target
+		sqlcmd -S $h -U $uname -P $password -i $first_script_target -m 1
 	}
 
 	#UPDATE previous and current version from database table
@@ -140,7 +140,7 @@ function script-execute {
 								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
 								write-host "MESSAGE:::$message"
 								if($message -like "*Msg*"){
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: + $message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = '$message'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
 								}
 								else{
