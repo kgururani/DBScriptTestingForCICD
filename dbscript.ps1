@@ -138,7 +138,7 @@ function script-execute {
 								}
 								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
 								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
-								write-host "MESSAGE:::$message"
+								$message=$message.replace("'",'')
 								if($message -like "*Msg*"){
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR:' + '$message' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 									exit 0
