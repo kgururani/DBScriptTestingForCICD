@@ -97,14 +97,14 @@ function script-execute {
 		$count_Rows = sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT COUNT(*) from $d.$version_table_logs WHERE VERSIONS = '$db_version' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		if($count_Rows -eq '1'){
 			#UPDATE number of files executed from database table
-			$NUMBER_OF_FILES_EXECUTED =sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; SELECT NUMBER_OF_FILES_EXECUTED from $d.$version_table_logs WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$NUMBER_OF_FILES_EXECUTED' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			$LAST_EXECUTED_VERSION =sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; SELECT LAST_EXECUTED_VERSION from $d.$version_table_logs WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET LAST_EXECUTED_CURRENT_FILE_VERSION = '$LAST_EXECUTED_VERSION' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		}
 		else{
-			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET EXECUTED_FILE_SEQ = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+			sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; update $d.$version_table SET LAST_EXECUTED_CURRENT_FILE_VERSION = '0'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 		}
 	}
-	$db_files_seq=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+	$db_files_seq=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT LAST_EXECUTED_CURRENT_FILE_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 
 	write-host "INFO: Previous Version on Db: "$db_previous_version
 	write-host "INFO: Current Version on DB: " $db_version
@@ -154,10 +154,10 @@ function script-execute {
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								}
 								##UPDATE current sub version from database table
-								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET EXECUTED_FILE_SEQ = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT EXECUTED_FILE_SEQ from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET LAST_EXECUTED_CURRENT_FILE_VERSION = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT LAST_EXECUTED_CURRENT_FILE_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								#UPDATE number of files executed from database table
-								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET NUMBER_OF_FILES_EXECUTED = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; UPDATE $d.$version_table_logs SET LAST_EXECUTED_VERSION = '$db_UPDATEd_sub_version' WHERE VERSIONS = '$db_version'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								
 							}
 						}
@@ -173,7 +173,7 @@ function script-execute {
 					}
 					else{
 						#Insert version number and number of files executed from database table
-						sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; INSERT INTO $d.$version_table_logs(VERSIONS,NUMBER_OF_FILES_EXECUTED) VALUES ('$db_version','$db_UPDATEd_sub_version') " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+						sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; INSERT INTO $d.$version_table_logs(VERSIONS,LAST_EXECUTED_VERSION) VALUES ('$db_version','$db_UPDATEd_sub_version') " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					
 					}
 
