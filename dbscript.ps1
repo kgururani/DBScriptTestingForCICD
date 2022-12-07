@@ -69,8 +69,8 @@ function script-execute {
 	            PRINT 'True'
             END")
 	##Adding sql scripts in repo to array
-	$sql_folders = Split-Path -Path "$repo_dir\DataBaseFiles\*" -Leaf -Resolve
-	$sql_file= Split-Path -Path "$repo_dir\DataBaseFiles\version-0\*.sql" -Leaf -Resolve
+	$sql_folders = Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\*" -Leaf -Resolve
+	$sql_file= Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\version-0\*.sql" -Leaf -Resolve
 	##Checking for table existence
 	$table_val= sqlcmd -h-1 -S $h -U $uname -P $password -v table= "$d.$version_table" -Q $query
 	if($table_val){
@@ -80,7 +80,7 @@ function script-execute {
 	    Write-Warning " Version table does not exist in DB. Creating the table as $d.$version_table"
 	    $first_script= ($sql_file | Measure -Min).Minimum
 		$first_script
-		$first_script_target= Get-ChildItem "$repo_dir\DataBaseFiles\version-0\$first_script"
+		$first_script_target= Get-ChildItem "$repo_dir\APP_DEV_Scripts_1\version-0\$first_script"
 		sqlcmd -S $h -U $uname -P $password -i $first_script_target -m 1
 	}
 
@@ -112,14 +112,13 @@ function script-execute {
 	$checkFolderExist = $false
 
 	for($i=0; $i -le ($sql_folders.count -1); $i +=1){		
-
 		if($sql_folders[$i] -ne 'version-0'){		
 			$version_num= $sql_folders[$i].split('-')[1]
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
 					$checkFolderExist = $true
-					$sql_files= Split-Path -Path "$repo_dir\DataBaseFiles\version-$version_num\*.sql" -Leaf -Resolve
+					$sql_files= Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "File Count:: $sql_files.count"
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						if($sql_files.count -eq '1'){
@@ -138,7 +137,7 @@ function script-execute {
 								else{
 									$exec_file=$sql_files[$j]
 								}
-								$target=Get-ChildItem "$repo_dir\DataBaseFiles\version-$version_num\$exec_file"
+								$target=Get-ChildItem "$repo_dir\APP_DEV_Scripts_1\version-$version_num\$exec_file"
 								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
 								try{
 									$message=$message.replace("'",'')
@@ -202,4 +201,3 @@ function script-execute {
 }
 
 script-execute
-
