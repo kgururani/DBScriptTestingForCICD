@@ -1,5 +1,5 @@
 #Project    MRMS
-#Version 	1.0
+#Version 	1.1
 #read the arguments from the Command Line Interface
 
 param (
@@ -119,7 +119,7 @@ function script-execute {
 				if($version_num -eq $db_version){
 					$checkFolderExist = $true
 					$sql_files= Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\version-$version_num\*.sql" -Leaf -Resolve
-					write-host "File Count:: $sql_files.count"
+					write-host $sql_files.count
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						if($sql_files.count -eq '1'){
 							$sub_version_num= $sql_files.split('-')[0]
