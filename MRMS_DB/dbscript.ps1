@@ -56,7 +56,6 @@ function script-execute {
 		        write-host "INFO: No branch provided to pull `n[WARNING]: This repo might be stale. Ensure using branch details to pull the latest data"
 	}
 	else {
-			git -C $repo_dir reset -- hard
 		        git -C $repo_dir pull origin $branch
 	}
 	##Declare array for sql files
