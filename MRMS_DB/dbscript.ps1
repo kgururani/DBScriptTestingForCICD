@@ -119,7 +119,6 @@ function script-execute {
 				if($version_num -eq $db_version){
 					$checkFolderExist = $true
 					$sql_files= Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\version-$version_num\*.sql" -Leaf -Resolve
-					write-host File Count:: $sql_files.count
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						if($sql_files.count -eq '1'){
 							$sub_version_num= $sql_files.split('-')[0]
@@ -129,9 +128,7 @@ function script-execute {
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check){
-							write-host $sub_version_num -gt $db_files_seq
-							write-host "sub_version_num: [int]$sub_version_num & db_files_seq:: [int]$db_files_seq"
-							if([int]$sub_version_num -gt [int]$db_files_seq){
+							if([$sub_version_num -gt $db_files_seq){
 								if($sql_files.count -eq '1'){
 									$exec_file=$sql_files
 								}
