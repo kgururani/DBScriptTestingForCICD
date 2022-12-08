@@ -13,7 +13,8 @@ v2.0            2022-10-18          V V Anirudh       create Script of DSR View
 														
 
 ##########################################################################*/
- 
+USE [BACMRMQA]
+GO 
  
    CREATE OR ALTER  VIEW [dbo].[DSR_VIEW]  
  AS
