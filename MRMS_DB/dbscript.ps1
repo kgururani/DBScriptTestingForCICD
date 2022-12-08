@@ -196,6 +196,7 @@ function script-execute {
 	write-host "Files with issue in name convention"
 	$sql_file_issue
 	}
+	write-host "End of the scripts"
 }
 
 script-execute
