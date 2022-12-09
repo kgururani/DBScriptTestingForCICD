@@ -1,3 +1,6 @@
+USE [BACMRMQA]
+GO
+
 CREATE TABLE [dbo].[FACT_DSR](
 	[DSR_ID] [numeric](24, 0) NOT NULL,
 	[MODEL_ID] [numeric](24, 0) NOT NULL,
