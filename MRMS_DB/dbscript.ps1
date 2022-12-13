@@ -142,7 +142,8 @@ function script-execute {
 								}
 								$target=Get-ChildItem "$repo_dir\APP_DEV_Scripts_1\version-$version_num\$exec_file"
 								write-host "TARGRT:::"$target
-								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
+								$message = sqlcmd -S $h -U $uname -P $password -i $target 
+								#-m 1
 								write-host "Message $i $j:::"$message
 								try{
 									$message=$message.replace("'",'')
@@ -180,9 +181,6 @@ function script-execute {
 						sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table_logs" -Q "set nocount on; INSERT INTO $d.$version_table_logs(VERSIONS,LAST_EXECUTED_VERSION) VALUES ('$db_version','$db_UPDATEd_sub_version') " | Format-List | Out-String | ForEach-Object { $_.Trim() }
 					
 					}
-
-					
-					
 				}
 				
 			}
