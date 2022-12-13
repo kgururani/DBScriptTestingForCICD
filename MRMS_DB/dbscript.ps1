@@ -117,6 +117,7 @@ function script-execute {
 			$version_num_check= $version_num -match '\d{1,3}\.\d{1,3}\.\d{1,3}'
 			if($version_num_check){
 				if($version_num -eq $db_version){
+					write-host "INFO::::"$version_num
 					$checkFolderExist = $true
 					$sql_files= Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\version-$version_num\*.sql" -Leaf -Resolve
 					write-host "File Count:: $sql_files.count"
@@ -140,6 +141,7 @@ function script-execute {
 									$exec_file=$sql_files[$j]
 								}
 								$target=Get-ChildItem "$repo_dir\APP_DEV_Scripts_1\version-$version_num\$exec_file"
+								write-host "TARGRT:::"$target
 								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
 								try{
 									$message=$message.replace("'",'')
