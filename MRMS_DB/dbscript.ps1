@@ -132,7 +132,7 @@ function script-execute {
 							write-host "sub_version_num: $sub_version_num & db_files_seq:: $db_files_seq"
 							if($sub_version_num -gt $db_files_seq){
 								if($sql_files.count -eq '1'){
-									write-host "If"
+									write-host "If" $sql_files
 									$exec_file=$sql_files
 								}
 								else{
