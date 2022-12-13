@@ -53,6 +53,61 @@ function script-execute {
 	}
 
 	if(!$branch){
+		        write-host "INFO: No branch provided to pull `n[WARNING]: This repo might #Project    MRMS
+#Version 	1.1
+#read the arguments from the Command Line Interface
+
+param (
+	$d,
+	$h,
+	$uname,
+	$branch, 
+	$password, 
+	$repo_dir,
+	$versionNumberToExecute
+	)
+
+## SQL Connection_check
+function Test-SqlConnection {
+param(
+      [Parameter(Mandatory)]
+      [string]$ServerName,
+      [Parameter(Mandatory)]
+      [string]$DatabaseName,
+      [Parameter(Mandatory)]
+      [string]$UserName,
+      [Parameter(Mandatory)]
+      [string]$PassWord 
+     )
+      $ErrorActionPreference = 'Stop'
+try {
+      $connectionString = 'Data Source={0};database={1};User ID={2};Password={3}' -f $ServerName,$DatabaseName,$userName,$PassWord
+      $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString
+      $sqlConnection.Open()
+## This will run if the Open() method does not throw an exception
+    $true
+} 	catch {
+    $false
+	}
+	finally {
+## Close the connection when we're done
+$sqlConnection.Close()
+	}
+}
+
+function script-execute {
+	$version_table = 'dbo.PIPELINE_CICD_CODE_VERSION'
+	$version_table_logs = 'dbo.PIPELINE_CICD_VERSION_LOGS'
+	$connection_check=Test-SqlConnection -ServerName $h -DatabaseName $d -Username $uname -PassWord $password
+	if($connection_check){
+		write-host "PASS: SQL Connection successfull"
+	}
+	else{
+	    Write-Error "ERROR: Connection failed. Please check the DB field values. Exiting now..."
+		exit 1
+	}
+
+	if(!$branch){
 		        write-host "INFO: No branch provided to pull `n[WARNING]: This repo might be stale. Ensure using branch details to pull the latest data"
 	}
 	else {
@@ -143,13 +198,13 @@ function script-execute {
 								catch{
 									$message=$message
 								}
-								if($message -like "*Msg*"){
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR:' + '$message' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-									exit 1
-								}
-								else{
-									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								}
+								#if($message -like "*Msg*"){
+								#	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR:' + '$message' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								#	exit 1
+								#}
+								#else{
+								#	sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								#}
 								##UPDATE current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET LAST_EXECUTED_CURRENT_FILE_VERSION = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT LAST_EXECUTED_CURRENT_FILE_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
