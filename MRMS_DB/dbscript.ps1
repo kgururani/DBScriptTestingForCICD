@@ -198,7 +198,13 @@ function script-execute {
 								catch{
 									$message=$message
 								}
-							
+								if($message -like "*Msg*"){
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR:' + '$message' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								#	exit 1
+								}
+								else{
+									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
+								}
 								##UPDATE current sub version from database table
 								sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET LAST_EXECUTED_CURRENT_FILE_VERSION = '$sub_version_num'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 								$db_UPDATEd_sub_version=sqlcmd -h-1 -S $h -U $uname -P $password -Q "set nocount on; SELECT LAST_EXECUTED_CURRENT_FILE_VERSION from $d.$version_table" | Format-List | Out-String | ForEach-Object { $_.Trim() }
@@ -232,7 +238,7 @@ function script-execute {
 				sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR: $sql_folders[$i] Foldername does not match the format, Please check the format again..'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
 				Write-Error "ERROR: $sql_folders[$i] Foldername does not match the format, Please check the format again.."
 				$sql_file_issue += $sql_files[$i]
-				exit 1
+				#exit 1
 			}	
 		}	
 	}
