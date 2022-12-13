@@ -53,61 +53,6 @@ function script-execute {
 	}
 
 	if(!$branch){
-		        write-host "INFO: No branch provided to pull `n[WARNING]: This repo might #Project    MRMS
-#Version 	1.1
-#read the arguments from the Command Line Interface
-
-param (
-	$d,
-	$h,
-	$uname,
-	$branch, 
-	$password, 
-	$repo_dir,
-	$versionNumberToExecute
-	)
-
-## SQL Connection_check
-function Test-SqlConnection {
-param(
-      [Parameter(Mandatory)]
-      [string]$ServerName,
-      [Parameter(Mandatory)]
-      [string]$DatabaseName,
-      [Parameter(Mandatory)]
-      [string]$UserName,
-      [Parameter(Mandatory)]
-      [string]$PassWord 
-     )
-      $ErrorActionPreference = 'Stop'
-try {
-      $connectionString = 'Data Source={0};database={1};User ID={2};Password={3}' -f $ServerName,$DatabaseName,$userName,$PassWord
-      $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $ConnectionString
-      $sqlConnection.Open()
-## This will run if the Open() method does not throw an exception
-    $true
-} 	catch {
-    $false
-	}
-	finally {
-## Close the connection when we're done
-$sqlConnection.Close()
-	}
-}
-
-function script-execute {
-	$version_table = 'dbo.PIPELINE_CICD_CODE_VERSION'
-	$version_table_logs = 'dbo.PIPELINE_CICD_VERSION_LOGS'
-	$connection_check=Test-SqlConnection -ServerName $h -DatabaseName $d -Username $uname -PassWord $password
-	if($connection_check){
-		write-host "PASS: SQL Connection successfull"
-	}
-	else{
-	    Write-Error "ERROR: Connection failed. Please check the DB field values. Exiting now..."
-		exit 1
-	}
-
-	if(!$branch){
 		        write-host "INFO: No branch provided to pull `n[WARNING]: This repo might be stale. Ensure using branch details to pull the latest data"
 	}
 	else {
@@ -174,6 +119,7 @@ function script-execute {
 				if($version_num -eq $db_version){
 					$checkFolderExist = $true
 					$sql_files= Split-Path -Path "$repo_dir\APP_DEV_Scripts_1\version-$version_num\*.sql" -Leaf -Resolve
+					write-host "File Count:: $sql_files.count"
 					for($j=0; $j -le ($sql_files.count -1); $j +=1){
 						if($sql_files.count -eq '1'){
 							$sub_version_num= $sql_files.split('-')[0]
@@ -183,7 +129,8 @@ function script-execute {
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check){
-							if($sub_version_num -gt $db_files_seq){
+							write-host "sub_version_num: [int]$sub_version_num & db_files_seq:: [int]$db_files_seq"
+							if([int]$sub_version_num -gt [int]$db_files_seq){
 								if($sql_files.count -eq '1'){
 									$exec_file=$sql_files
 								}
@@ -200,7 +147,7 @@ function script-execute {
 								}
 								if($message -like "*Msg*"){
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'ERROR:' + '$message' " | Format-List | Out-String | ForEach-Object { $_.Trim() }
-								#	exit 1
+									#exit 1
 								}
 								else{
 									sqlcmd -h-1 -S $h -U $uname -P $password -v table = "$d.$version_table" -Q "set nocount on; UPDATE $d.$version_table SET MESSAGE = 'SUCCESS'" | Format-List | Out-String | ForEach-Object { $_.Trim() }
@@ -251,7 +198,6 @@ function script-execute {
 	write-host "Files with issue in name convention"
 	$sql_file_issue
 	}
-	write-host "End of the scripts"
 }
 
 script-execute
