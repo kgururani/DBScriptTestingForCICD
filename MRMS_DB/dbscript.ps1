@@ -143,6 +143,7 @@ function script-execute {
 								$target=Get-ChildItem "$repo_dir\APP_DEV_Scripts_1\version-$version_num\$exec_file"
 								write-host "TARGRT:::"$target
 								$message = sqlcmd -S $h -U $uname -P $password -i $target -m 1
+								write-host "Message $i $j:::"$message
 								try{
 									$message=$message.replace("'",'')
 								}
