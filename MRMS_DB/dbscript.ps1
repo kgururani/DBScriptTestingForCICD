@@ -129,8 +129,8 @@ function script-execute {
 						}
 						$sub_version_num_check= $sub_version_num -match '\d{1,3}'
 						if($sub_version_num_check){
-							write-host "sub_version_num: [int]$sub_version_num & db_files_seq:: [int]$db_files_seq"
-							if([int]$sub_version_num -gt [int]$db_files_seq){
+							write-host "sub_version_num: $sub_version_num & db_files_seq:: $db_files_seq"
+							if($sub_version_num -gt $db_files_seq){
 								if($sql_files.count -eq '1'){
 									$exec_file=$sql_files
 								}
