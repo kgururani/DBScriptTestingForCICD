@@ -132,9 +132,11 @@ function script-execute {
 							write-host "sub_version_num: $sub_version_num & db_files_seq:: $db_files_seq"
 							if($sub_version_num -gt $db_files_seq){
 								if($sql_files.count -eq '1'){
+									write-host "If"
 									$exec_file=$sql_files
 								}
 								else{
+									write-host "else"
 									$exec_file=$sql_files[$j]
 								}
 								$target=Get-ChildItem "$repo_dir\APP_DEV_Scripts_1\version-$version_num\$exec_file"
